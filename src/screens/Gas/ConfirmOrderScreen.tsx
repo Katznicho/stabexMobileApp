@@ -90,102 +90,11 @@ const ConfirmOrderScreen = () => {
 
     }
 
-    const onClickPlaceOrder = () => {
-        if (selectedPaymentOption.id == 1 || selectedPaymentOption.id == 3) {
-            setOpenDeliveryPicker(false)
-            onPlacePaymentOrder()
-        }
-        else {
-            setOpenDeliveryPicker(false)
-            onPlaceOrder()
-        }
-    }
 
-    const onPlaceOrder = async () => {
-        try {
-            const extractedData = cartList.map(item => ({
-                price: item.price,
-                product_id: item.product_id,
-                quantity: item.quantity,
-                total_price: item.price * item.quantity
-            }));
 
-            const headers = new Headers();
-            headers.append('Accept', 'application/json');
-            headers.append("X-Requested-With", "XMLHttpRequest");
-            headers.append('Authorization', `Bearer ${authToken}`);
-
-            const totalCost = totalPrice + deliveryCharge
-
-            const body = new FormData();
-            body.append('order_type', deliveryOption);
-            body.append('address_type', selectedDeliveryAddress?.address_type);
-            body.append("address", selectedDeliveryAddress?.address);
-            body.append('longitude', selectedDeliveryAddress?.longitude);
-            body.append('latitude', selectedDeliveryAddress?.latitude);
-            body.append('purchase_cost', totalPrice);
-            body.append('delivery_cost', deliveryCharge);
-            body.append('total_cost', totalCost);
-            body.append('delivery_address_id', selectedDeliveryAddress?.id);
-            body.append('payment_method_id', selectedPaymentOption?.id);
-            body.append('products', JSON.stringify(extractedData));
-            body.append('station_id', station?.id);
-            setLoading(true)
-            fetch(CREATE_MY_ORDER, {
-                method: 'POST',
-                headers,
-                body
-            })
-                .then((response) => response.json())
-                .then((json) => {
-                    setLoading(false)
-                    if (json.response == "success") {
-                        dispatch(emptyCart())
-                        showMessage({
-                            'message': "Order Placed",
-                            "description": "Your order has been placed",
-                            'type': "success",
-                            'icon': "success",
-                            animated: true,
-                            autoHide: true,
-                            duration: 3000
-                        })
-
-                        return navigation.navigate("Orders");
-                    }
-                    else {
-                        return showMessage({
-                            'message': "Something went wrong",
-                            "description": "Please try again",
-                            'type': "danger",
-                            'icon': "danger",
-                        })
-                    }
-                })
-                .catch((error) => {
-                    setLoading(false)
-                    return showMessage({
-                        'message': "Something went wrong",
-                        "description": "Please try again",
-                        'type': "danger",
-                        'icon': "danger",
-                    })
-                });
-
-        } catch (error) {
-            setLoading(false)
-            return showMessage({
-                'message': "Something went wrong",
-                "description": "Please try again",
-                'type': "danger",
-                'icon': "danger",
-            })
-
-        }
-
-    }
 
     const onPlacePaymentOrder = () => {
+        console.log("placing order")
         try {
             setLoading(true)
 
@@ -193,9 +102,8 @@ const ConfirmOrderScreen = () => {
                 price: item.unit_price,
                 product_id: item.Id,
                 quantity: item.quantity,
-                total_price: item.price * item.quantity
+                total_price: item.unit_price * item.quantity
             }));
-
 
             const headers = new Headers();
             headers.append('Accept', 'application/json');
@@ -221,6 +129,8 @@ const ConfirmOrderScreen = () => {
 
             })
 
+            console.log(bodyData)
+
 
             fetch(`${CREATE_CUSTOMER_ORDER_WITH_PAYMENT}`, {
                 headers,
@@ -229,11 +139,17 @@ const ConfirmOrderScreen = () => {
             })
                 .then(a => a.json())
                 .then(result => {
+
+                    console.log("===================response result=========")
+                    console.log(result)
+                    console.log("=============response result===============")
+
                     setLoading(false)
                     if (result.status == 1) {
                         setIsVisible(true)
                         showMessage({
-                            message: "A Top Up request has been sent to your phone. You will receive an a pop up shortly.",
+                            message: "Your order has been placed.",
+                            description: "We will contact you shortly",
                             type: "success",
                             icon: "success",
                             duration: 3000
@@ -255,6 +171,9 @@ const ConfirmOrderScreen = () => {
                 })
 
         } catch (error) {
+            console.log("===================response error=========")
+            console.log(error)
+            console.log("=============response error===============")
             setLoading(false)
             return showMessage({
                 'message': "Something went wrong",
@@ -544,7 +463,7 @@ const ConfirmOrderScreen = () => {
                                     (!selectedPaymentOption) && { opacity: 0.5 }
                                 ]}
                                 activeOpacity={1}
-                                onPress={() => onClickPlaceOrder()}
+                                onPress={() => onPlacePaymentOrder()}
                                 disabled={!selectedPaymentOption}
                             >
                                 <Text style={generalStyles.loginText}>Place Order</Text>

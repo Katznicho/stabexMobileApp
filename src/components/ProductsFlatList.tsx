@@ -32,7 +32,7 @@ const ProductsFlatList = ({ station, category, products }: any) => {
         return (
             <View style={styles.productContainer}>
                 <Image source={{ uri: item?.image ? `${item.base_url}/${item.image}` : item?.image }} style={styles.productImage} />
-                <Text style={[generalStyles.CardTitle]}>{item.name}</Text>
+                <Text style={[generalStyles.CardTitle]}>{item?.name}</Text>
                 <Text style={[generalStyles.CardSubtitle]}> {formatCurrency(item?.unit_price)}</Text>
                 <View style={styles.quantityContainer}>
                     <TouchableOpacity
@@ -72,7 +72,7 @@ const ProductsFlatList = ({ station, category, products }: any) => {
     return (
         <View style={styles.container}>
             {
-                cartList?.length && (
+                cartList?.length > 0 && (
                     <View style={[generalStyles.absoluteStyles, { bottom: 20, right: 20, left: 20 }]}>
                         <TouchableOpacity
                             activeOpacity={1}

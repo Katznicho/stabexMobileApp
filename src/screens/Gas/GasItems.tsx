@@ -50,6 +50,8 @@ const GasItems = () => {
                     category={category}
                     products={data?.data}
                 />
+
+
             ) : (
                 <View style={[generalStyles.centerContent, generalStyles.viewStyles]}>
                     <EmptyContainer
